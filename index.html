@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <style>
+        textarea {
+            background: url(http://i.imgur.com/2cOaJ.png);
+            background-attachment: local;
+            background-repeat: no-repeat;
+            padding-left: 35px;
+            padding-top: 10px;
+            border-color: #ccc;
+        }
+    </style>
+    <script defer>
+        /*  Language code
+        
+            C# = 1
+            VB.NET = 2
+            F# = 3
+            Java = 4
+            Python = 5
+            C (gcc) = 6
+            C++ (gcc) = 7
+            Php = 8
+            Pascal = 9
+            Objective-C = 10
+            Haskell = 11
+            Ruby = 12
+            Perl = 13
+            Lua = 14
+            Nasm = 15
+            Sql Server = 16
+            Javascript = 17
+            Lisp = 18
+            Prolog = 19
+            Go = 20
+            Scala = 21
+            Scheme = 22
+            Node.js = 23
+            Python 3 = 24
+            Octave = 25
+            C (clang) = 26
+            C++ (clang) = 27    
+            C++ (vc++) = 28
+            C (vc) = 29
+            D = 30
+            R = 31
+            Tcl = 32
+            MySQL = 33
+            PostgreSQL = 34
+            Oracle = 35
+            Swift = 37
+            Bash = 38
+            Ada = 39
+            Erlang = 40
+            Elixir = 41
+            Ocaml = 42
+            Kotlin = 43
+            Brainf*** = 44
+            Fortran = 45,
+            Rust = 46,
+            Clojure = 47
+        */
+        $(document).ready(function () {
+            var langVal = "";
+            // var input = document.getElementById('input').value;
+            var args = "source_file.c -o a.out";
+            $('select').change(function () {
+                langVal = $(this).val();
+                console.log(langVal);
+                switch (langVal) {
+                    case 'c':
+                        langVal = 6;
+                        args = "source_file.c -o a.out";
+                        document.getElementById('code').innerHTML = '//gcc 7.4.0\n#include  <stdio.h>\nint main()\n{\nprintf("Hello, world!");\nreturn 0;\n}';
+                        break;
+                    case 'c++':
+                        langVal = 7;
+                        args = "source_file.cpp -o a.out";
+                        document.getElementById('code').innerHTML = '//g++  7.4.0\n#include <iostream>\nint main()\n{\nstd::cout<< "Hello, world!";\n}'
+                        break;
+                    case 'java':
+                        langVal = 4;
+                        document.getElementById('code').innerHTML = '//main method must be in class Rextester\n\nimport java.util.*;\nimport java.lang.*; \nclass Rextester {  \npublic static void main(String args[]) { \n System.out.println("Hello, World!"); \n } \n}';
+                        break;
+                    case 'python3':
+                        langVal = 24;
+                        document.getElementById('code').innerHTML = '#python 3.6.9\nprint ("Hello, world!")';
+                        break;
+                    case 'python2':
+                        langVal = 5;
+                        document.getElementById('code').innerHTML = '#Python 2.7.17\nprint "Hello, world!"';
+                        break;
+                    default:
+                        break;
+                }
+            });
+            $("#run").click(function () {
+                var inputVal = $('#inputVal').val();
+                var code = $("#code").val();
+                if (code == 'Choose a language and type your code here') {
+                    alert("Choose your language");
+                    return false;
+                }
+                // alert(inputVal);
+                var to_compile = {
+                    "LanguageChoice": langVal,
+                    "Program": code,
+                    "Input": inputVal,
+                    "CompilerArgs": args
+                };
+                $.ajax({
+                    url: "https://rextester.com/rundotnet/api",
+                    type: "POST",
+                    data: to_compile
+                }).done(function (data) {
+                    console.log(data);
+                    document.getElementById('result').innerText = data.Result;
+                    if (data.Errors != null) {
+                        alert(data.Errors);
+                    }
+                }).fail(function (data, err) {
+                    alert("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
+                });
+            });
+        });
+    </script>
+    <title>D-Compiler</title>
+</head>
+
+<body style="background-color: aqua;">
+    <div class="container-fluid">
+        <h4 style="text-align: center; margin-top: 1px; text-decoration: underline;">D-Compiler</h4>
+        <label style="margin-left: 5px;" for="languages">Language:</label>
+        <select id="langs" style="background-color: rgb(255, 255, 255); border: 1px; border-style: solid; border-radius: 5px;">
+            <option value="" disabled selected>Select</option>
+            <option value="c">C</option>
+            <option value="c++">C++</option>
+            <option value="java">Java</option>
+            <option value="python3">Python3</option>
+            <option value="python2">Python2</option>
+        </select>
+        <textarea rows="10"
+            style="margin-top: 1px; border: 1px; border-radius: 5px; border-style: solid; font-size: medium; font-weight: 900; display: block; resize: none; width: 100%; background-color: black; color: azure; text-align: left;"
+            id="code">Choose a language and type your code here</textarea>
+
+        <button id="run" class="btn btn-success" style=" margin-top: 5px;">Run</button>
+        <h6 style="margin-top: 5px;">Input (comma seperated):</h6>
+        <input style="width: 100%; color: rgb(240, 236, 236); background-color: black;" id="inputVal" type="text">
+
+        <h6 style="margin-top: 5px;">Output:</h5>
+            <div class="card">
+                <div class="card-body" id="result"
+                    style="color: rgb(226, 218, 218); background-color: black; text-align: left; font-size: small; font-weight: 900; font-family: monospace;">
+                    Press the Run button !!
+                </div>
+            </div>
+    </div>
+
+
+</body>
+
+</html>
